@@ -23,6 +23,27 @@
             align-items: center;
             min-height: 100vh;
             color: #333;
+            position: relative;
+        }
+
+        /* Bouton de contrôle de la musique */
+        .audio-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .audio-control:hover {
+            background-color: white;
+            color: var(--dark-color);
         }
 
         .quiz-container {
@@ -48,7 +69,6 @@
             display: block;
         }
 
-        /* Styles des boutons */
         .btn {
             background-color: var(--primary-color);
             color: white;
@@ -69,7 +89,6 @@
             filter: brightness(1.1);
         }
 
-        /* Options de réponse */
         .options-container {
             display: flex;
             flex-direction: column;
@@ -89,7 +108,6 @@
             transform: none;
         }
 
-        /* Progression */
         .progress {
             font-size: 14px;
             color: #777;
@@ -105,22 +123,27 @@
 </head>
 <body>
 
+    <audio id="bg-music" loop>
+        <source src="https://actions.google.com/sounds/v1/science_fiction/ambient_space_machine.ogg" type="audio/ogg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+        Votre navigateur ne supporte pas l'élément audio.
+    </audio>
+
+    <button class="audio-control" id="audio-btn" onclick="toggleMusic()">🎵 Musique : OFF</button>
+
     <div class="quiz-container">
         
         <div id="menu-screen" class="screen active">
             <h1>🏆 Super Quiz Interactif 🏆</h1>
             <p>Choisissez votre domaine préféré pour commencer le défi :</p>
-            <div id="categories-menu">
-                </div>
+            <div id="categories-menu"></div>
         </div>
 
         <div id="quiz-screen" class="screen">
             <h2 id="quiz-title">Domaine</h2>
             <div class="progress" id="progress-text">Question 1 sur X</div>
             <h3 id="question-text">La question s'affichera ici</h3>
-            
-            <div class="options-container" id="options-menu">
-                </div>
+            <div class="options-container" id="options-menu"></div>
         </div>
 
         <div id="result-screen" class="screen">
@@ -133,20 +156,12 @@
     </div>
 
     <script>
-        // --- DONNÉES DU QUIZ ---
         const quizData = {
-            "Jeux Vidéo 🎮": [
-    {
-        question: "Qui est le compagnon de Link dans Zelda : Ocarina of Time ?",
-        options: ["Navi", "Zelda", "Mario", "Yoshi"],
-        reponse: 0 // Navi est le premier choix (index 0)
-    }
-]
             "Joueurs de Football ⚽": [
                 {
                     question: "Quel joueur a remporté le plus de Ballons d'Or dans l'histoire ?",
                     options: ["Cristiano Ronaldo", "Lionel Messi", "Zinédine Zidane", "Pelé"],
-                    reponse: 1 // L'index de la bonne réponse (0 pour le 1er, 1 pour le 2e...)
+                    reponse: 1
                 },
                 {
                     question: "Dans quel club espagnol Kylian Mbappé a-t-il été transféré ?",
@@ -178,7 +193,6 @@
             ]
         };
 
-        // --- VARIABLES DE JEU ---
         let categorieActuelle = "";
         let indexQuestionActuelle = 0;
         let score = 0;
@@ -194,10 +208,22 @@
         const optionsMenu = document.getElementById('options-menu');
         const finalScore = document.getElementById('final-score');
         const feedbackText = document.getElementById('feedback-text');
+        
+        // Gestion de la musique
+        const bgMusic = document.getElementById('bg-music');
+        const audioBtn = document.getElementById('audio-btn');
 
-        // --- FONCTIONS ---
+        // Fonction pour activer/désactiver la musique
+        function toggleMusic() {
+            if (bgMusic.paused) {
+                bgMusic.play().catch(error => console.log("Lecture automatique bloquée par le navigateur. Cliquez à nouveau."));
+                audioBtn.innerText = "🔊 Musique : ON";
+            } else {
+                bgMusic.pause();
+                audioBtn.innerText = "🎵 Musique : OFF";
+            }
+        }
 
-        // Générer le menu au chargement
         function genererMenu() {
             categoriesMenu.innerHTML = "";
             Object.keys(quizData).forEach(categorie => {
@@ -209,34 +235,31 @@
             });
         }
 
-        // Lancer le quiz pour une catégorie
         function lancerQuiz(categorie) {
+            // Lancer la musique automatiquement dès que le joueur clique sur une catégorie 
+            // (les navigateurs modernes forcent une action utilisateur avant de jouer du son)
+            if (bgMusic.paused && audioBtn.innerText.includes("OFF")) {
+                toggleMusic();
+            }
+
             categorieActuelle = categorie;
             indexQuestionActuelle = 0;
             score = 0;
-
             quizTitle.innerText = categorieActuelle;
             
-            // Changer d'écran
             menuScreen.classList.remove('active');
             quizScreen.classList.add('active');
-
             afficherQuestion();
         }
 
-        // Afficher la question courante
         function afficherQuestion() {
             const listeQuestions = quizData[categorieActuelle];
             const q = listeQuestions[indexQuestionActuelle];
 
-            // Mettre à jour la progression et la question
             progressText.innerText = `Question ${indexQuestionActuelle + 1} sur ${listeQuestions.length}`;
             questionText.innerText = q.question;
-
-            // Vider les anciennes options
             optionsMenu.innerHTML = "";
 
-            // Générer les nouveaux boutons de réponse
             q.options.forEach((option, index) => {
                 const boutonOption = document.createElement('button');
                 boutonOption.className = 'btn option-btn';
@@ -246,7 +269,6 @@
             });
         }
 
-        // Vérifier la réponse cliquée
         function verifierReponse(indexChoisi) {
             const listeQuestions = quizData[categorieActuelle];
             const bonneReponse = listeQuestions[indexQuestionActuelle].reponse;
@@ -258,7 +280,6 @@
                 alert(`❌ Faux ! La bonne réponse était : ${listeQuestions[indexQuestionActuelle].options[bonneReponse]}`);
             }
 
-            // Passer à la question suivante ou finir le jeu
             indexQuestionActuelle++;
             if (indexQuestionActuelle < listeQuestions.length) {
                 afficherQuestion();
@@ -267,15 +288,12 @@
             }
         }
 
-        // Afficher l'écran de fin
         function afficherResultats() {
             const total = quizData[categorieActuelle].length;
             quizScreen.classList.remove('active');
             resultScreen.classList.add('active');
-
             finalScore.innerText = `Votre score : ${score} / ${total}`;
 
-            // Message personnalisé selon le score
             if (score === total) {
                 feedbackText.innerText = "🏆 Incroyable ! Un sans-faute parfait !";
             } else if (score >= total / 2) {
@@ -285,14 +303,13 @@
             }
         }
 
-        // Revenir au menu principal
         function retourAuMenu() {
             resultScreen.classList.remove('active');
             menuScreen.classList.add('active');
         }
 
-        // Initialisation du jeu
         genererMenu();
     </script>
 </body>
 </html>
+       
