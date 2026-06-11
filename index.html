@@ -5,35 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jeu de Quiz Interactif</title>
     <style>
+        /* NOUVELLES COULEURS : Thème Sombre & Moderne */
         :root {
-            --primary-color: #4a90e2;
-            --success-color: #2ecc71;
-            --danger-color: #e74c3c;
-            --dark-color: #2c3e50;
-            --light-color: #f8f9fa;
+            --primary-color: #ff4757;   /* Rouge vif */
+            --accent-color: #1e90ff;    /* Bleu électrique */
+            --success-color: #2ed573;   /* Vert clair */
+            --bg-dark: #1e272e;         /* Fond principal très sombre */
+            --panel-bg: #2f3542;        /* Fond des blocs gris foncé */
+            --text-light: #f1f2f6;      /* Texte blanc cassé */
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--bg-dark);
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: #333;
+            color: var(--text-light);
             position: relative;
         }
 
-        /* Bouton de contrôle de la musique */
         .audio-control {
             position: absolute;
             top: 20px;
             right: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid white;
+            background-color: var(--panel-bg);
+            color: var(--text-light);
+            border: 2px solid var(--accent-color);
             padding: 10px 15px;
             border-radius: 30px;
             cursor: pointer;
@@ -42,32 +43,28 @@
         }
 
         .audio-control:hover {
-            background-color: white;
-            color: var(--dark-color);
+            background-color: var(--accent-color);
+            color: white;
         }
 
         .quiz-container {
-            background-color: white;
+            background-color: var(--panel-bg);
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             padding: 30px;
             width: 100%;
             max-width: 600px;
             text-align: center;
+            border-top: 5px solid var(--primary-color);
         }
 
-        h1 {
-            color: var(--dark-color);
+        h1, h2, h3 {
+            color: white;
             margin-bottom: 25px;
         }
 
-        .screen {
-            display: none;
-        }
-
-        .active {
-            display: block;
-        }
+        .screen { display: none; }
+        .active { display: block; }
 
         .btn {
             background-color: var(--primary-color);
@@ -85,48 +82,67 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
             filter: brightness(1.1);
         }
 
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-
         .option-btn {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-            border: 2px solid #e0e0e0;
+            background-color: #57606f;
+            color: white;
+            border: 2px solid #747d8c;
         }
 
         .option-btn:hover {
-            background-color: #edf2f7;
-            border-color: var(--primary-color);
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
             transform: none;
+            box-shadow: none;
         }
 
         .progress {
             font-size: 14px;
-            color: #777;
+            color: #a4b0be;
             margin-bottom: 15px;
         }
 
         .score-text {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 10px 0;
+            color: var(--accent-color);
         }
+
+        /* Styles pour la zone de correction à la fin */
+        .corrections-container {
+            max-height: 350px;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding-right: 10px;
+            text-align: left;
+        }
+
+        /* Personnalisation de la barre de défilement */
+        .corrections-container::-webkit-scrollbar { width: 8px; }
+        .corrections-container::-webkit-scrollbar-track { background: #57606f; border-radius: 4px; }
+        .corrections-container::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+
+        .correction-item {
+            background: #1e272e;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .correction-item p { margin: 5px 0; }
+        .question-title { font-weight: bold; font-size: 15px; }
+        .correct-ans { color: var(--success-color); }
+        .wrong-ans { color: var(--primary-color); }
     </style>
 </head>
 <body>
 
     <audio id="bg-music" loop>
         <source src="https://actions.google.com/sounds/v1/science_fiction/ambient_space_machine.ogg" type="audio/ogg">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
-        Votre navigateur ne supporte pas l'élément audio.
     </audio>
 
     <button class="audio-control" id="audio-btn" onclick="toggleMusic()">🎵 Musique : OFF</button>
@@ -135,22 +151,25 @@
         
         <div id="menu-screen" class="screen active">
             <h1>🏆 Super Quiz Interactif 🏆</h1>
-            <p>Choisissez votre domaine préféré pour commencer le défi :</p>
+            <p>Choisissez un domaine (10 questions par partie) :</p>
             <div id="categories-menu"></div>
         </div>
 
         <div id="quiz-screen" class="screen">
             <h2 id="quiz-title">Domaine</h2>
-            <div class="progress" id="progress-text">Question 1 sur X</div>
+            <div class="progress" id="progress-text">Question 1 sur 10</div>
             <h3 id="question-text">La question s'affichera ici</h3>
-            <div class="options-container" id="options-menu"></div>
+            <div id="options-menu" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;"></div>
         </div>
 
         <div id="result-screen" class="screen">
             <h1>Fin de la partie !</h1>
-            <div class="score-text" id="final-score">Votre score : 0 / 0</div>
-            <p id="feedback-text">Message d'encouragement</p>
-            <button class="btn" onclick="retourAuMenu()">🔄 Rejouer une partie</button>
+            <div class="score-text" id="final-score">Score : 0 / 10</div>
+            <p id="feedback-text"></p>
+            
+            <div id="corrections-zone" class="corrections-container"></div>
+
+            <button class="btn" onclick="retourAuMenu()">🔄 Retour au Menu</button>
         </div>
 
     </div>
@@ -158,46 +177,48 @@
     <script>
         const quizData = {
             "Joueurs de Football ⚽": [
-                {
-                    question: "Quel joueur a remporté le plus de Ballons d'Or dans l'histoire ?",
-                    options: ["Cristiano Ronaldo", "Lionel Messi", "Zinédine Zidane", "Pelé"],
-                    reponse: 1
-                },
-                {
-                    question: "Dans quel club espagnol Kylian Mbappé a-t-il été transféré ?",
-                    options: ["FC Barcelone", "Atlético de Madrid", "Real Madrid", "Séville FC"],
-                    reponse: 2
-                },
-                {
-                    question: "Quel pays a remporté la Coupe du Monde de la FIFA en 2022 ?",
-                    options: ["France", "Brésil", "Argentine", "Maroc"],
-                    reponse: 2
-                }
+                { question: "Quel joueur a remporté le plus de Ballons d'Or dans l'histoire ?", options: ["Cristiano Ronaldo", "Lionel Messi", "Zinédine Zidane", "Pelé"], reponse: 1 },
+                { question: "Dans quel club espagnol Kylian Mbappé a-t-il été transféré en 2024 ?", options: ["FC Barcelone", "Atlético de Madrid", "Real Madrid", "Séville FC"], reponse: 2 },
+                { question: "Quel pays a remporté la Coupe du Monde de la FIFA en 2022 ?", options: ["France", "Brésil", "Argentine", "Maroc"], reponse: 2 },
+                { question: "Quel est le surnom de la légende brésilienne Pelé ?", options: ["Le Roi", "El Fenomeno", "La Pulga", "L'Extraterrestre"], reponse: 0 },
+                { question: "Quelle nation détient le record de victoires en Coupe du Monde (5 fois) ?", options: ["Italie", "Brésil", "Allemagne", "Argentine"], reponse: 1 },
+                { question: "Comment s'appelle le stade mythique du FC Barcelone ?", options: ["Santiago Bernabéu", "San Siro", "Anfield", "Camp Nou"], reponse: 3 },
+                { question: "Qui est le meilleur buteur de l'histoire de la Ligue des Champions ?", options: ["Cristiano Ronaldo", "Robert Lewandowski", "Lionel Messi", "Karim Benzema"], reponse: 0 },
+                { question: "Quelle est la nationalité de l'attaquant Erling Haaland ?", options: ["Suédoise", "Norvégienne", "Danoise", "Islandaise"], reponse: 1 },
+                { question: "Combien de temps dure un match de football professionnel (sans prolongations) ?", options: ["80 minutes", "100 minutes", "90 minutes", "120 minutes"], reponse: 2 },
+                { question: "Quel joueur français a remporté le Ballon d'Or en 2022 ?", options: ["Karim Benzema", "Antoine Griezmann", "Kylian Mbappé", "N'Golo Kanté"], reponse: 0 }
             ],
             "Dessins Animés 🎬": [
-                {
-                    question: "Dans Bob l'Éponge, quel animal est son animal de compagnie, Gary ?",
-                    options: ["Un chat", "Un escargot", "Un méduse", "Un crabe"],
-                    reponse: 1
-                },
-                {
-                    question: "Quel est le nom de la souris rapide dans Looney Tunes ?",
-                    options: ["Speedy Gonzales", "Mickey", "Jerry", "Bugs Bunny"],
-                    reponse: 0
-                },
-                {
-                    question: "Qui est le pokémon de départ de Sacha dans la série animée ?",
-                    options: ["Salamèche", "Pikachu", "Carapuce", "Bulbizarre"],
-                    reponse: 1
-                }
+                { question: "Dans Bob l'Éponge, quel animal est son animal de compagnie, Gary ?", options: ["Un chat", "Un escargot", "Une méduse", "Un crabe"], reponse: 1 },
+                { question: "Quel est le nom de la souris la plus rapide du Mexique dans les Looney Tunes ?", options: ["Speedy Gonzales", "Mickey Mouse", "Jerry", "Minus"], reponse: 0 },
+                { question: "Quel est le premier Pokémon que Sacha obtient dans la série animée ?", options: ["Salamèche", "Pikachu", "Carapuce", "Bulbizarre"], reponse: 1 },
+                { question: "Comment s'appelle le jeune lionceau héros du film Le Roi Lion ?", options: ["Mufasa", "Scar", "Simba", "Timon"], reponse: 2 },
+                { question: "De quelle couleur est la peau des Schtroumpfs ?", options: ["Verte", "Rouge", "Bleue", "Jaune"], reponse: 2 },
+                { question: "Quel est le nom de la famille jaune qui vit à Springfield ?", options: ["Les Simpson", "Les Griffin", "Les Flintstones", "Les Jetson"], reponse: 0 },
+                { question: "Qui est l'ennemi juré, maquillé en clown, de Batman ?", options: ["Le Pingouin", "Double-Face", "L'Homme-Mystère", "Le Joker"], reponse: 3 },
+                { question: "Quel est le nom du fidèle compagnon de Shrek ?", options: ["Le Chat potté", "L'Âne", "Le Dragon", "Pinocchio"], reponse: 1 },
+                { question: "Quel est le nom du chien blanc qui accompagne toujours Tintin ?", options: ["Idéfix", "Milou", "Pluto", "Snoopy"], reponse: 1 },
+                { question: "Dans l'anime Naruto, quel est le rêve du personnage principal ?", options: ["Devenir Hokage", "Trouver le One Piece", "Détruire le monde", "Devenir un Dieu de la Mort"], reponse: 0 }
+            ],
+            "Pixel Art & Jeux Rétro 👾": [
+                { question: "Quel format d'image est le plus recommandé pour enregistrer du Pixel Art sans perte de qualité ?", options: ["PNG", "JPEG", "MP4", "PDF"], reponse: 0 },
+                { question: "Quel jeu culte de 1980 demande de manger des pac-gommes dans un labyrinthe ?", options: ["Tetris", "Pac-Man", "Donkey Kong", "Space Invaders"], reponse: 1 },
+                { question: "Dans le jeu Tetris, de combien de petits blocs carrés est composée chaque pièce ?", options: ["3", "5", "4", "6"], reponse: 2 },
+                { question: "Quel logiciel basique de Microsoft a été utilisé par des millions de personnes pour dessiner pixel par pixel ?", options: ["Photoshop", "MS Paint", "Illustrator", "Blender"], reponse: 1 },
+                { question: "Quelle est la couleur principale de la casquette et de la salopette de Mario ?", options: ["Vert", "Jaune", "Rouge", "Bleu"], reponse: 2 },
+                { question: "Quel jeu vidéo populaire est entièrement construit avec des blocs pixelisés (voxels) ?", options: ["Fortnite", "Zelda", "Roblox", "Minecraft"], reponse: 3 },
+                { question: "Comment s'appelle le petit dinosaure vert de l'ère 16-bits de Nintendo ?", options: ["Bowser", "Toad", "Yoshi", "Rex"], reponse: 2 },
+                { question: "Sur quelle console est sorti le tout premier jeu Sonic the Hedgehog en 1991 ?", options: ["Super Nintendo", "Mega Drive", "PlayStation", "Game Boy"], reponse: 1 },
+                { question: "Quelle célèbre franchise de jeu d'arcade met en scène des extraterrestres pixelisés descendant du ciel ?", options: ["Space Invaders", "Asteroids", "Galaga", "Centipede"], reponse: 0 },
+                { question: "Comment s'appelle l'héroïne en armure du jeu rétro Metroid (1986) ?", options: ["Zelda", "Lara Croft", "Peach", "Samus Aran"], reponse: 3 }
             ]
         };
 
         let categorieActuelle = "";
         let indexQuestionActuelle = 0;
         let score = 0;
+        let reponsesUtilisateur = []; // Pour stocker les réponses du joueur
 
-        // Éléments HTML
         const menuScreen = document.getElementById('menu-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultScreen = document.getElementById('result-screen');
@@ -208,19 +229,20 @@
         const optionsMenu = document.getElementById('options-menu');
         const finalScore = document.getElementById('final-score');
         const feedbackText = document.getElementById('feedback-text');
+        const correctionsZone = document.getElementById('corrections-zone');
         
-        // Gestion de la musique
         const bgMusic = document.getElementById('bg-music');
         const audioBtn = document.getElementById('audio-btn');
 
-        // Fonction pour activer/désactiver la musique
         function toggleMusic() {
             if (bgMusic.paused) {
-                bgMusic.play().catch(error => console.log("Lecture automatique bloquée par le navigateur. Cliquez à nouveau."));
+                bgMusic.play().catch(() => console.log("Lecture bloquée"));
                 audioBtn.innerText = "🔊 Musique : ON";
+                audioBtn.style.borderColor = "var(--success-color)";
             } else {
                 bgMusic.pause();
                 audioBtn.innerText = "🎵 Musique : OFF";
+                audioBtn.style.borderColor = "var(--accent-color)";
             }
         }
 
@@ -236,15 +258,13 @@
         }
 
         function lancerQuiz(categorie) {
-            // Lancer la musique automatiquement dès que le joueur clique sur une catégorie 
-            // (les navigateurs modernes forcent une action utilisateur avant de jouer du son)
-            if (bgMusic.paused && audioBtn.innerText.includes("OFF")) {
-                toggleMusic();
-            }
+            if (bgMusic.paused && audioBtn.innerText.includes("OFF")) { toggleMusic(); }
 
             categorieActuelle = categorie;
             indexQuestionActuelle = 0;
             score = 0;
+            reponsesUtilisateur = []; // Réinitialiser l'historique des réponses
+
             quizTitle.innerText = categorieActuelle;
             
             menuScreen.classList.remove('active');
@@ -264,24 +284,19 @@
                 const boutonOption = document.createElement('button');
                 boutonOption.className = 'btn option-btn';
                 boutonOption.innerText = option;
-                boutonOption.onclick = () => verifierReponse(index);
+                boutonOption.onclick = () => enregistrerReponse(index);
                 optionsMenu.appendChild(boutonOption);
             });
         }
 
-        function verifierReponse(indexChoisi) {
-            const listeQuestions = quizData[categorieActuelle];
-            const bonneReponse = listeQuestions[indexQuestionActuelle].reponse;
-
-            if (indexChoisi === bonneReponse) {
-                score++;
-                alert("🎉 Bonne réponse !");
-            } else {
-                alert(`❌ Faux ! La bonne réponse était : ${listeQuestions[indexQuestionActuelle].options[bonneReponse]}`);
-            }
-
+        function enregistrerReponse(indexChoisi) {
+            // Sauvegarder le choix sans afficher d'alerte
+            reponsesUtilisateur.push(indexChoisi);
+            
             indexQuestionActuelle++;
-            if (indexQuestionActuelle < listeQuestions.length) {
+            
+            // Si on n'a pas atteint la fin, afficher la suivante, sinon les résultats
+            if (indexQuestionActuelle < quizData[categorieActuelle].length) {
                 afficherQuestion();
             } else {
                 afficherResultats();
@@ -289,17 +304,49 @@
         }
 
         function afficherResultats() {
-            const total = quizData[categorieActuelle].length;
+            const listeQuestions = quizData[categorieActuelle];
+            const total = listeQuestions.length;
+            score = 0;
+            correctionsZone.innerHTML = ""; // Vider l'ancienne correction
+
+            // Générer le bloc de correction et calculer le score final
+            listeQuestions.forEach((q, index) => {
+                const reponseDonnee = reponsesUtilisateur[index];
+                const estCorrect = (reponseDonnee === q.reponse);
+                
+                if (estCorrect) score++;
+
+                // Couleur de la bordure gauche selon la réponse
+                const bordureCouleur = estCorrect ? "var(--success-color)" : "var(--primary-color)";
+                const icone = estCorrect ? "✅" : "❌";
+
+                // Construire le HTML pour chaque question
+                let htmlCorrection = `
+                    <div class="correction-item" style="border-left: 5px solid ${bordureCouleur};">
+                        <p class="question-title">${index + 1}. ${q.question}</p>
+                        <p>Ta réponse : <span class="${estCorrect ? 'correct-ans' : 'wrong-ans'}">${q.options[reponseDonnee]}</span> ${icone}</p>
+                `;
+
+                // S'il a faux, on ajoute la ligne de la vraie réponse
+                if (!estCorrect) {
+                    htmlCorrection += `<p>👉 La bonne réponse était : <strong class="correct-ans">${q.options[q.reponse]}</strong></p>`;
+                }
+
+                htmlCorrection += `</div>`;
+                correctionsZone.innerHTML += htmlCorrection;
+            });
+
+            // Gérer l'affichage final
             quizScreen.classList.remove('active');
             resultScreen.classList.add('active');
-            finalScore.innerText = `Votre score : ${score} / ${total}`;
+            finalScore.innerText = `Score : ${score} / ${total}`;
 
             if (score === total) {
-                feedbackText.innerText = "🏆 Incroyable ! Un sans-faute parfait !";
+                feedbackText.innerText = "🏆 Un sans-faute parfait ! Impressionnant !";
             } else if (score >= total / 2) {
-                feedbackText.innerText = "👍 Bien joué ! Tu te débrouilles super bien.";
+                feedbackText.innerText = "👍 Bien joué ! Regarde tes erreurs ci-dessous pour t'améliorer.";
             } else {
-                feedbackText.innerText = "🙃 Dommage... Entraîne-toi encore et réessaye !";
+                feedbackText.innerText = "🙃 Aïe... Lis bien la correction pour la prochaine fois !";
             }
         }
 
