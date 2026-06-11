@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Quiz Interactif</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .quiz-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--dark-color);
+            margin-bottom: 25px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        /* Styles des boutons */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 10px;
+            width: 80%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            filter: brightness(1.1);
+        }
+
+        /* Options de réponse */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            border: 2px solid #e0e0e0;
+        }
+
+        .option-btn:hover {
+            background-color: #edf2f7;
+            border-color: var(--primary-color);
+            transform: none;
+        }
+
+        /* Progression */
+        .progress {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .score-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        
+        <div id="menu-screen" class="screen active">
+            <h1>🏆 Super Quiz Interactif 🏆</h1>
+            <p>Choisissez votre domaine préféré pour commencer le défi :</p>
+            <div id="categories-menu">
+                </div>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <h2 id="quiz-title">Domaine</h2>
+            <div class="progress" id="progress-text">Question 1 sur X</div>
+            <h3 id="question-text">La question s'affichera ici</h3>
+            
+            <div class="options-container" id="options-menu">
+                </div>
+        </div>
+
+        <div id="result-screen" class="screen">
+            <h1>Fin de la partie !</h1>
+            <div class="score-text" id="final-score">Votre score : 0 / 0</div>
+            <p id="feedback-text">Message d'encouragement</p>
+            <button class="btn" onclick="retourAuMenu()">🔄 Rejouer une partie</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DONNÉES DU QUIZ ---
+        const quizData = {
+            "Jeux Vidéo 🎮": [
+    {
+        question: "Qui est le compagnon de Link dans Zelda : Ocarina of Time ?",
+        options: ["Navi", "Zelda", "Mario", "Yoshi"],
+        reponse: 0 // Navi est le premier choix (index 0)
+    }
+]
+            "Joueurs de Football ⚽": [
+                {
+                    question: "Quel joueur a remporté le plus de Ballons d'Or dans l'histoire ?",
+                    options: ["Cristiano Ronaldo", "Lionel Messi", "Zinédine Zidane", "Pelé"],
+                    reponse: 1 // L'index de la bonne réponse (0 pour le 1er, 1 pour le 2e...)
+                },
+                {
+                    question: "Dans quel club espagnol Kylian Mbappé a-t-il été transféré ?",
+                    options: ["FC Barcelone", "Atlético de Madrid", "Real Madrid", "Séville FC"],
+                    reponse: 2
+                },
+                {
+                    question: "Quel pays a remporté la Coupe du Monde de la FIFA en 2022 ?",
+                    options: ["France", "Brésil", "Argentine", "Maroc"],
+                    reponse: 2
+                }
+            ],
+            "Dessins Animés 🎬": [
+                {
+                    question: "Dans Bob l'Éponge, quel animal est son animal de compagnie, Gary ?",
+                    options: ["Un chat", "Un escargot", "Un méduse", "Un crabe"],
+                    reponse: 1
+                },
+                {
+                    question: "Quel est le nom de la souris rapide dans Looney Tunes ?",
+                    options: ["Speedy Gonzales", "Mickey", "Jerry", "Bugs Bunny"],
+                    reponse: 0
+                },
+                {
+                    question: "Qui est le pokémon de départ de Sacha dans la série animée ?",
+                    options: ["Salamèche", "Pikachu", "Carapuce", "Bulbizarre"],
+                    reponse: 1
+                }
+            ]
+        };
+
+        // --- VARIABLES DE JEU ---
+        let categorieActuelle = "";
+        let indexQuestionActuelle = 0;
+        let score = 0;
+
+        // Éléments HTML
+        const menuScreen = document.getElementById('menu-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const categoriesMenu = document.getElementById('categories-menu');
+        const quizTitle = document.getElementById('quiz-title');
+        const progressText = document.getElementById('progress-text');
+        const questionText = document.getElementById('question-text');
+        const optionsMenu = document.getElementById('options-menu');
+        const finalScore = document.getElementById('final-score');
+        const feedbackText = document.getElementById('feedback-text');
+
+        // --- FONCTIONS ---
+
+        // Générer le menu au chargement
+        function genererMenu() {
+            categoriesMenu.innerHTML = "";
+            Object.keys(quizData).forEach(categorie => {
+                const bouton = document.createElement('button');
+                bouton.className = 'btn';
+                bouton.innerText = categorie;
+                bouton.onclick = () => lancerQuiz(categorie);
+                categoriesMenu.appendChild(bouton);
+            });
+        }
+
+        // Lancer le quiz pour une catégorie
+        function lancerQuiz(categorie) {
+            categorieActuelle = categorie;
+            indexQuestionActuelle = 0;
+            score = 0;
+
+            quizTitle.innerText = categorieActuelle;
+            
+            // Changer d'écran
+            menuScreen.classList.remove('active');
+            quizScreen.classList.add('active');
+
+            afficherQuestion();
+        }
+
+        // Afficher la question courante
+        function afficherQuestion() {
+            const listeQuestions = quizData[categorieActuelle];
+            const q = listeQuestions[indexQuestionActuelle];
+
+            // Mettre à jour la progression et la question
+            progressText.innerText = `Question ${indexQuestionActuelle + 1} sur ${listeQuestions.length}`;
+            questionText.innerText = q.question;
+
+            // Vider les anciennes options
+            optionsMenu.innerHTML = "";
+
+            // Générer les nouveaux boutons de réponse
+            q.options.forEach((option, index) => {
+                const boutonOption = document.createElement('button');
+                boutonOption.className = 'btn option-btn';
+                boutonOption.innerText = option;
+                boutonOption.onclick = () => verifierReponse(index);
+                optionsMenu.appendChild(boutonOption);
+            });
+        }
+
+        // Vérifier la réponse cliquée
+        function verifierReponse(indexChoisi) {
+            const listeQuestions = quizData[categorieActuelle];
+            const bonneReponse = listeQuestions[indexQuestionActuelle].reponse;
+
+            if (indexChoisi === bonneReponse) {
+                score++;
+                alert("🎉 Bonne réponse !");
+            } else {
+                alert(`❌ Faux ! La bonne réponse était : ${listeQuestions[indexQuestionActuelle].options[bonneReponse]}`);
+            }
+
+            // Passer à la question suivante ou finir le jeu
+            indexQuestionActuelle++;
+            if (indexQuestionActuelle < listeQuestions.length) {
+                afficherQuestion();
+            } else {
+                afficherResultats();
+            }
+        }
+
+        // Afficher l'écran de fin
+        function afficherResultats() {
+            const total = quizData[categorieActuelle].length;
+            quizScreen.classList.remove('active');
+            resultScreen.classList.add('active');
+
+            finalScore.innerText = `Votre score : ${score} / ${total}`;
+
+            // Message personnalisé selon le score
+            if (score === total) {
+                feedbackText.innerText = "🏆 Incroyable ! Un sans-faute parfait !";
+            } else if (score >= total / 2) {
+                feedbackText.innerText = "👍 Bien joué ! Tu te débrouilles super bien.";
+            } else {
+                feedbackText.innerText = "🙃 Dommage... Entraîne-toi encore et réessaye !";
+            }
+        }
+
+        // Revenir au menu principal
+        function retourAuMenu() {
+            resultScreen.classList.remove('active');
+            menuScreen.classList.add('active');
+        }
+
+        // Initialisation du jeu
+        genererMenu();
+    </script>
+</body>
+</html>
