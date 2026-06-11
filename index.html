@@ -5,144 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jeu de Quiz Interactif</title>
     <style>
-        /* NOUVELLES COULEURS : Thème Sombre & Moderne */
+        /* THÈME COULEURS CLAIRES : Lumineux et Moderne */
         :root {
-            --primary-color: #ff4757;   /* Rouge vif */
-            --accent-color: #1e90ff;    /* Bleu électrique */
-            --success-color: #2ed573;   /* Vert clair */
-            --bg-dark: #1e272e;         /* Fond principal très sombre */
-            --panel-bg: #2f3542;        /* Fond des blocs gris foncé */
-            --text-light: #f1f2f6;      /* Texte blanc cassé */
+            --primary-color: #4a90e2;   /* Bleu vif moderne */
+            --accent-color: #34495e;    /* Gris foncé pour les textes importants */
+            --success-color: #2ecc71;   /* Vert pour les bonnes réponses */
+            --danger-color: #e74c3c;    /* Rouge pour les mauvaises réponses */
+            --bg-light: #f5f7fa;        /* Fond de page très clair */
+            --panel-bg: #ffffff;        /* Fond des blocs (Blanc pur) */
+            --text-dark: #2c3e50;       /* Couleur du texte principal */
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: var(--text-light);
+            color: var(--text-dark);
             position: relative;
         }
 
+        /* Bouton de contrôle de la musique */
         .audio-control {
             position: absolute;
             top: 20px;
             right: 20px;
             background-color: var(--panel-bg);
-            color: var(--text-light);
-            border: 2px solid var(--accent-color);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
             padding: 10px 15px;
             border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .audio-control:hover {
-            background-color: var(--accent-color);
+            background-color: var(--primary-color);
             color: white;
         }
 
         .quiz-container {
             background-color: var(--panel-bg);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            padding: 35px;
             width: 100%;
             max-width: 600px;
             text-align: center;
-            border-top: 5px solid var(--primary-color);
+            border-top: 6px solid var(--primary-color);
         }
 
-        h1, h2, h3 {
-            color: white;
+        h1 {
+            color: var(--accent-color);
             margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        h2, h3 {
+            color: var(--text-dark);
         }
 
         .screen { display: none; }
         .active { display: block; }
 
+        /* Boutons principaux */
         .btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 14px 25px;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
             margin: 10px;
-            width: 80%;
+            width: 85%;
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
-            filter: brightness(1.1);
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.3);
+            filter: brightness(1.05);
         }
 
+        /* Boutons d'options du Quiz */
         .option-btn {
-            background-color: #57606f;
-            color: white;
-            border: 2px solid #747d8c;
+            background-color: #f8fafc;
+            color: var(--text-dark);
+            border: 2px solid #e2e8f0;
+            box-shadow: none;
         }
 
         .option-btn:hover {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
             transform: none;
             box-shadow: none;
         }
 
         .progress {
             font-size: 14px;
-            color: #a4b0be;
+            color: #7f8c8d;
             margin-bottom: 15px;
+            font-weight: 600;
         }
 
         .score-text {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
-            margin: 10px 0;
-            color: var(--accent-color);
+            margin: 15px 0;
+            color: var(--primary-color);
         }
 
-        /* Styles pour la zone de correction à la fin */
+        /* Container de la correction de fin */
         .corrections-container {
             max-height: 350px;
             overflow-y: auto;
-            margin: 20px 0;
+            margin: 25px 0;
             padding-right: 10px;
             text-align: left;
         }
 
-        /* Personnalisation de la barre de défilement */
-        .corrections-container::-webkit-scrollbar { width: 8px; }
-        .corrections-container::-webkit-scrollbar-track { background: #57606f; border-radius: 4px; }
-        .corrections-container::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+        .corrections-container::-webkit-scrollbar { width: 6px; }
+        .corrections-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .corrections-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
         .correction-item {
-            background: #1e272e;
+            background: #f8fafc;
             padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
 
-        .correction-item p { margin: 5px 0; }
-        .question-title { font-weight: bold; font-size: 15px; }
-        .correct-ans { color: var(--success-color); }
-        .wrong-ans { color: var(--primary-color); }
+        .correction-item p { margin: 6px 0; }
+        .question-title { font-weight: bold; color: var(--accent-color); }
+        .correct-ans { color: var(--success-color); font-weight: 600; }
+        .wrong-ans { color: var(--danger-color); font-weight: 600; }
     </style>
 </head>
 <body>
 
     <audio id="bg-music" loop>
-        <source src="https://actions.google.com/sounds/v1/science_fiction/ambient_space_machine.ogg" type="audio/ogg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mp3">
     </audio>
 
     <button class="audio-control" id="audio-btn" onclick="toggleMusic()">🎵 Musique : OFF</button>
@@ -151,25 +165,25 @@
         
         <div id="menu-screen" class="screen active">
             <h1>🏆 Super Quiz Interactif 🏆</h1>
-            <p>Choisissez un domaine (10 questions par partie) :</p>
-            <div id="categories-menu"></div>
+            <p style="color: #7f8c8d;">Choisissez votre catégorie préférée (10 questions) :</p>
+            <div id="categories-menu" style="margin-top: 25px;"></div>
         </div>
 
         <div id="quiz-screen" class="screen">
-            <h2 id="quiz-title">Domaine</h2>
+            <h2 id="quiz-title" style="color: var(--primary-color);">Domaine</h2>
             <div class="progress" id="progress-text">Question 1 sur 10</div>
             <h3 id="question-text">La question s'affichera ici</h3>
             <div id="options-menu" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;"></div>
         </div>
 
         <div id="result-screen" class="screen">
-            <h1>Fin de la partie !</h1>
+            <h1>Fin du Quiz !</h1>
             <div class="score-text" id="final-score">Score : 0 / 10</div>
-            <p id="feedback-text"></p>
+            <p id="feedback-text" style="font-weight: 600;"></p>
             
             <div id="corrections-zone" class="corrections-container"></div>
 
-            <button class="btn" onclick="retourAuMenu()">🔄 Retour au Menu</button>
+            <button class="btn" onclick="retourAuMenu()">🔄 Rejouer</button>
         </div>
 
     </div>
@@ -217,7 +231,7 @@
         let categorieActuelle = "";
         let indexQuestionActuelle = 0;
         let score = 0;
-        let reponsesUtilisateur = []; // Pour stocker les réponses du joueur
+        let reponsesUtilisateur = [];
 
         const menuScreen = document.getElementById('menu-screen');
         const quizScreen = document.getElementById('quiz-screen');
@@ -236,13 +250,15 @@
 
         function toggleMusic() {
             if (bgMusic.paused) {
-                bgMusic.play().catch(() => console.log("Lecture bloquée"));
+                bgMusic.play().catch(() => console.log("Lecture audio bloquée initialement."));
                 audioBtn.innerText = "🔊 Musique : ON";
-                audioBtn.style.borderColor = "var(--success-color)";
+                audioBtn.style.backgroundColor = "var(--primary-color)";
+                audioBtn.style.color = "white";
             } else {
                 bgMusic.pause();
                 audioBtn.innerText = "🎵 Musique : OFF";
-                audioBtn.style.borderColor = "var(--accent-color)";
+                audioBtn.style.backgroundColor = "var(--panel-bg)";
+                audioBtn.style.color = "var(--primary-color)";
             }
         }
 
@@ -258,15 +274,15 @@
         }
 
         function lancerQuiz(categorie) {
+            // Active la musique automatiquement lors du clic si le joueur ne l'a pas éteinte
             if (bgMusic.paused && audioBtn.innerText.includes("OFF")) { toggleMusic(); }
 
             categorieActuelle = categorie;
             indexQuestionActuelle = 0;
             score = 0;
-            reponsesUtilisateur = []; // Réinitialiser l'historique des réponses
+            reponsesUtilisateur = [];
 
             quizTitle.innerText = categorieActuelle;
-            
             menuScreen.classList.remove('active');
             quizScreen.classList.add('active');
             afficherQuestion();
@@ -290,12 +306,9 @@
         }
 
         function enregistrerReponse(indexChoisi) {
-            // Sauvegarder le choix sans afficher d'alerte
             reponsesUtilisateur.push(indexChoisi);
-            
             indexQuestionActuelle++;
             
-            // Si on n'a pas atteint la fin, afficher la suivante, sinon les résultats
             if (indexQuestionActuelle < quizData[categorieActuelle].length) {
                 afficherQuestion();
             } else {
@@ -307,46 +320,41 @@
             const listeQuestions = quizData[categorieActuelle];
             const total = listeQuestions.length;
             score = 0;
-            correctionsZone.innerHTML = ""; // Vider l'ancienne correction
+            correctionsZone.innerHTML = ""; 
 
-            // Générer le bloc de correction et calculer le score final
             listeQuestions.forEach((q, index) => {
                 const reponseDonnee = reponsesUtilisateur[index];
                 const estCorrect = (reponseDonnee === q.reponse);
                 
                 if (estCorrect) score++;
 
-                // Couleur de la bordure gauche selon la réponse
-                const bordureCouleur = estCorrect ? "var(--success-color)" : "var(--primary-color)";
+                const bordureCouleur = estCorrect ? "var(--success-color)" : "var(--danger-color)";
                 const icone = estCorrect ? "✅" : "❌";
 
-                // Construire le HTML pour chaque question
                 let htmlCorrection = `
                     <div class="correction-item" style="border-left: 5px solid ${bordureCouleur};">
                         <p class="question-title">${index + 1}. ${q.question}</p>
                         <p>Ta réponse : <span class="${estCorrect ? 'correct-ans' : 'wrong-ans'}">${q.options[reponseDonnee]}</span> ${icone}</p>
                 `;
 
-                // S'il a faux, on ajoute la ligne de la vraie réponse
                 if (!estCorrect) {
-                    htmlCorrection += `<p>👉 La bonne réponse était : <strong class="correct-ans">${q.options[q.reponse]}</strong></p>`;
+                    htmlCorrection += `<p style="margin-top:4px;">👉 Bonne réponse : <strong class="correct-ans">${q.options[q.reponse]}</strong></p>`;
                 }
 
                 htmlCorrection += `</div>`;
                 correctionsZone.innerHTML += htmlCorrection;
             });
 
-            // Gérer l'affichage final
             quizScreen.classList.remove('active');
             resultScreen.classList.add('active');
             finalScore.innerText = `Score : ${score} / ${total}`;
 
             if (score === total) {
-                feedbackText.innerText = "🏆 Un sans-faute parfait ! Impressionnant !";
+                feedbackText.innerText = "🏆 Un sans-faute parfait ! Tu es un génie !";
             } else if (score >= total / 2) {
-                feedbackText.innerText = "👍 Bien joué ! Regarde tes erreurs ci-dessous pour t'améliorer.";
+                feedbackText.innerText = "👍 Très bon score ! Regarde la correction en dessous.";
             } else {
-                feedbackText.innerText = "🙃 Aïe... Lis bien la correction pour la prochaine fois !";
+                feedbackText.innerText = "🙃 Tu feras mieux au prochain essai ! Lis la correction.";
             }
         }
 
@@ -359,4 +367,3 @@
     </script>
 </body>
 </html>
-       
