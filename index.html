@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jeu de Quiz Interactif</title>
     <style>
-        /* THÈME COULEURS CLAIRES */
+        /* NOUVEAU THÈME : DARK MODE / NÉON VIOLET */
         :root {
-            --primary-color: #4a90e2;   
-            --accent-color: #34495e;    
-            --success-color: #2ecc71;   
-            --danger-color: #e74c3c;    
-            --bg-light: #f5f7fa;        
-            --panel-bg: #ffffff;        
-            --text-dark: #2c3e50;       
+            --primary-color: #9d4edd;   /* Violet lumineux */
+            --accent-color: #ff9e00;    /* Orange néon */
+            --success-color: #06d6a0;   /* Vert menthe */
+            --danger-color: #ef476f;    /* Rose/Rouge vif */
+            --panel-bg: #10002b;        /* Bleu-violet très sombre */
+            --text-dark: #f8f9fa;       /* Blanc cassé pour le texte */
+            --option-bg: #240046;       /* Fond des boutons d'options */
+            --option-border: #3c096c;   /* Bordure des boutons */
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            background: linear-gradient(135deg, #10002b 0%, #3c096c 100%);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -48,19 +49,20 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.2);
             font-family: inherit;
         }
 
         .control-btn:hover {
             background-color: var(--primary-color);
             color: white;
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.5);
         }
 
         .quiz-container {
             background-color: var(--panel-bg);
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
             padding: 35px;
             width: 100%;
             max-width: 600px;
@@ -73,6 +75,7 @@
             color: var(--accent-color);
             margin-bottom: 25px;
             font-size: 28px;
+            text-shadow: 0 2px 10px rgba(255, 158, 0, 0.3);
         }
 
         h2, h3 { color: var(--text-dark); }
@@ -92,42 +95,42 @@
             transition: all 0.2s ease;
             margin: 10px;
             width: 85%;
-            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
+            box-shadow: 0 4px 10px rgba(157, 78, 221, 0.3);
             font-family: inherit;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.3);
-            filter: brightness(1.05);
+            box-shadow: 0 6px 15px rgba(157, 78, 221, 0.5);
+            filter: brightness(1.1);
         }
 
         /* Bouton rouge pour quitter */
         .btn-danger {
             background-color: var(--danger-color);
-            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
+            box-shadow: 0 4px 10px rgba(239, 71, 111, 0.3);
         }
         .btn-danger:hover {
-            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
+            box-shadow: 0 6px 15px rgba(239, 71, 111, 0.5);
         }
 
         .option-btn {
-            background-color: #f8fafc;
+            background-color: var(--option-bg);
             color: var(--text-dark);
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--option-border);
             box-shadow: none;
         }
 
         .option-btn:hover {
-            background-color: #e3f2fd;
+            background-color: var(--option-border);
             border-color: var(--primary-color);
-            color: var(--primary-color);
+            color: white;
             transform: none;
         }
 
         .progress {
             font-size: 14px;
-            color: #7f8c8d;
+            color: #adb5bd;
             margin-bottom: 15px;
             font-weight: 600;
         }
@@ -136,13 +139,14 @@
             font-size: 32px;
             font-weight: bold;
             margin: 15px 0;
-            color: var(--primary-color);
+            color: var(--accent-color);
+            text-shadow: 0 2px 10px rgba(255, 158, 0, 0.3);
         }
 
         /* Correction immédiate */
         #immediate-feedback {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background-color: var(--option-bg);
+            border: 1px solid var(--option-border);
             border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
@@ -168,22 +172,23 @@
             padding: 0 10px;
             text-align: start;
         }
-        .corrections-container::-webkit-scrollbar { width: 6px; }
-        .corrections-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .corrections-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        .corrections-container::-webkit-scrollbar { width: 8px; }
+        .corrections-container::-webkit-scrollbar-track { background: var(--option-bg); border-radius: 4px; }
+        .corrections-container::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
 
         .correction-item {
-            background: #f8fafc;
+            background: var(--option-bg);
             padding: 15px;
             margin-bottom: 12px;
             border-radius: 10px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--option-border);
             border-inline-start: 5px solid;
         }
         .correction-item p { margin: 6px 0; }
         .question-title { font-weight: bold; color: var(--accent-color); }
-        .correct-ans { color: var(--success-color); font-weight: 600; }
-        .wrong-ans { color: var(--danger-color); font-weight: 600; }
+        .correct-ans { color: var(--success-color); font-weight: 600; text-shadow: 0 0 5px rgba(6, 214, 160, 0.4); }
+        .wrong-ans { color: var(--danger-color); font-weight: 600; text-shadow: 0 0 5px rgba(239, 71, 111, 0.4); }
     </style>
 </head>
 <body>
@@ -202,7 +207,7 @@
         <!-- MENU PRINCIPAL -->
         <div id="menu-screen" class="screen active">
             <h1 id="menu-title">🏆 Super Quiz Interactif 🏆</h1>
-            <p id="menu-desc" style="color: #7f8c8d;">Choisissez votre catégorie préférée (10 questions) :</p>
+            <p id="menu-desc" style="color: #adb5bd;">Choisissez votre catégorie préférée (10 questions) :</p>
             <div id="categories-menu" style="margin-top: 25px;"></div>
         </div>
 
@@ -464,7 +469,6 @@
             progressText.innerText = loc.progressText(indexQuestionActuelle + 1, listeQuestions.length);
             questionText.innerText = q.question;
             
-            // Afficher les options, cacher la correction
             optionsMenu.style.display = "flex";
             immediateFeedback.style.display = "none";
             optionsMenu.innerHTML = "";
@@ -486,7 +490,6 @@
             const q = listeQuestions[indexQuestionActuelle];
             const estCorrect = (indexChoisi === q.reponse);
 
-            // Cacher les options, afficher la correction
             optionsMenu.style.display = "none";
             immediateFeedback.style.display = "block";
 
@@ -555,7 +558,6 @@
             genererMenu();
         }
 
-        // Initialisation
         mettreAJourTextesUI();
         genererMenu();
     </script>
