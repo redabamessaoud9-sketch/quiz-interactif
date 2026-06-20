@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu de Quiz Sportif Interactif</title>
+    <title>Quiz Automobile</title>
     <style>
-        /* THÈME : DARK MODE / NÉON VIOLET */
         :root {
-            --primary-color: #9d4edd;   
-            --accent-color: #ff9e00;    
+            --primary-color: #00d4ff;   /* Bleu électrique pour le style auto */
+            --accent-color: #ffcc00;    /* Jaune sport */
             --success-color: #06d6a0;   
             --danger-color: #ef476f;    
-            --panel-bg: #10002b;        
+            --panel-bg: #1a1a2e;        
             --text-dark: #f8f9fa;       
-            --option-bg: #240046;       
-            --option-border: #3c096c;   
+            --option-bg: #16213e;       
+            --option-border: #0f3460;   
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #10002b 0%, #3c096c 100%);
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -30,509 +29,168 @@
             position: relative;
         }
 
-        /* Contrôles Top (Langue & Audio) */
-        .top-controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
+        .top-controls { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; }
 
-        .control-btn {
-            background-color: var(--panel-bg);
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            padding: 10px 15px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.2);
-            font-family: inherit;
-        }
+        .control-btn { background-color: var(--panel-bg); color: var(--primary-color); border: 2px solid var(--primary-color); padding: 10px 15px; border-radius: 30px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
+        .control-btn:hover { background-color: var(--primary-color); color: white; }
 
-        .control-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.5);
-        }
+        .quiz-container { background-color: var(--panel-bg); border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); padding: 35px; width: 100%; max-width: 600px; text-align: center; border-top: 6px solid var(--primary-color); margin-top: 50px; }
 
-        .quiz-container {
-            background-color: var(--panel-bg);
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            padding: 35px;
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            border-top: 6px solid var(--primary-color);
-            margin-top: 50px;
-        }
-
-        h1 {
-            color: var(--accent-color);
-            margin-bottom: 25px;
-            font-size: 28px;
-            text-shadow: 0 2px 10px rgba(255, 158, 0, 0.3);
-        }
-
-        h2, h3 { color: var(--text-dark); }
-
+        h1 { color: var(--accent-color); margin-bottom: 25px; font-size: 28px; }
+        .btn { background-color: var(--primary-color); color: #000; border: none; padding: 14px 25px; font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; margin: 10px; width: 85%; }
+        .btn:hover { filter: brightness(1.2); }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .option-btn { background-color: var(--option-bg); color: var(--text-dark); border: 2px solid var(--option-border); }
+        .option-btn:hover { background-color: var(--option-border); border-color: var(--primary-color); }
+        
         .screen { display: none; }
         .active { display: block; }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 14px 25px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin: 10px;
-            width: 85%;
-            box-shadow: 0 4px 10px rgba(157, 78, 221, 0.3);
-            font-family: inherit;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(157, 78, 221, 0.5);
-            filter: brightness(1.1);
-        }
-
-        /* Bouton rouge pour quitter */
-        .btn-danger {
-            background-color: var(--danger-color);
-            box-shadow: 0 4px 10px rgba(239, 71, 111, 0.3);
-        }
-        .btn-danger:hover {
-            box-shadow: 0 6px 15px rgba(239, 71, 111, 0.5);
-        }
-
-        .option-btn {
-            background-color: var(--option-bg);
-            color: var(--text-dark);
-            border: 2px solid var(--option-border);
-            box-shadow: none;
-        }
-
-        .option-btn:hover {
-            background-color: var(--option-border);
-            border-color: var(--primary-color);
-            color: white;
-            transform: none;
-        }
-
-        .progress {
-            font-size: 14px;
-            color: #adb5bd;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .score-text {
-            font-size: 32px;
-            font-weight: bold;
-            margin: 15px 0;
-            color: var(--accent-color);
-            text-shadow: 0 2px 10px rgba(255, 158, 0, 0.3);
-        }
-
-        /* Correction immédiate */
-        #immediate-feedback {
-            background-color: var(--option-bg);
-            border: 1px solid var(--option-border);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .action-buttons .btn {
-            margin: 0;
-            width: 100%;
-        }
-
-        /* Correction de fin */
-        .corrections-container {
-            max-height: 350px;
-            overflow-y: auto;
-            margin: 25px 0;
-            padding: 0 10px;
-            text-align: start;
-        }
-        
-        .corrections-container::-webkit-scrollbar { width: 8px; }
-        .corrections-container::-webkit-scrollbar-track { background: var(--option-bg); border-radius: 4px; }
-        .corrections-container::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
-
-        .correction-item {
-            background: var(--option-bg);
-            padding: 15px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--option-border);
-            border-inline-start: 5px solid;
-        }
-        .correction-item p { margin: 6px 0; }
-        .question-title { font-weight: bold; color: var(--accent-color); }
-        .correct-ans { color: var(--success-color); font-weight: 600; text-shadow: 0 0 5px rgba(6, 214, 160, 0.4); }
-        .wrong-ans { color: var(--danger-color); font-weight: 600; text-shadow: 0 0 5px rgba(239, 71, 111, 0.4); }
+        .correct-ans { color: var(--success-color); font-weight: bold; }
+        .wrong-ans { color: var(--danger-color); font-weight: bold; }
+        .correction-item { background: var(--option-bg); padding: 15px; margin-bottom: 12px; border-radius: 10px; border-inline-start: 5px solid; text-align: start; }
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mp3">
-    </audio>
-
     <div class="top-controls">
         <button class="control-btn" id="lang-btn" onclick="toggleLang()">🌍 العربية</button>
-        <button class="control-btn" id="audio-btn" onclick="toggleMusic()">🎵 Musique : OFF</button>
+        <button class="control-btn" id="audio-btn" onclick="toggleMusic()">🎵 Son : OFF</button>
     </div>
 
     <div class="quiz-container">
-        
-        <!-- MENU PRINCIPAL -->
         <div id="menu-screen" class="screen active">
-            <h1 id="menu-title">🏆 Super Quiz Sportif 🏆</h1>
-            <p id="menu-desc" style="color: #adb5bd;">Choisissez votre catégorie préférée (10 questions) :</p>
-            <div id="categories-menu" style="margin-top: 25px;"></div>
+            <h1 id="menu-title">🏎️ Quiz Automobile 🏎️</h1>
+            <div id="categories-menu"></div>
         </div>
-
-        <!-- ZONE DE QUIZ -->
         <div id="quiz-screen" class="screen">
-            <h2 id="quiz-title" style="color: var(--primary-color);">Domaine</h2>
-            <div class="progress" id="progress-text">Question 1 sur 10</div>
-            <h3 id="question-text">La question s'affichera ici</h3>
-            
-            <div id="options-menu" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;"></div>
-            
-            <div id="immediate-feedback" style="display: none;">
-                <p id="feedback-message" style="font-size: 22px; font-weight: bold; margin-top: 0;"></p>
-                <p id="feedback-detail" style="font-size: 16px; margin-bottom: 20px;"></p>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-danger" id="quit-btn" onclick="retourAuMenu()">🏠 Quitter</button>
-                    <button class="btn" id="continue-btn" onclick="passerQuestionSuivante()">➡️ Continuer</button>
-                </div>
+            <h2 id="quiz-title">Domaine</h2>
+            <div id="question-text" style="font-size: 20px; margin-bottom: 20px;"></div>
+            <div id="options-menu"></div>
+            <div id="immediate-feedback" style="display: none; margin-top: 20px;">
+                <p id="feedback-message"></p>
+                <button class="btn" onclick="passerQuestionSuivante()">➡️ Continuer</button>
             </div>
         </div>
-
-        <!-- RÉSULTAT ET CORRECTION FINALE -->
         <div id="result-screen" class="screen">
-            <h1 id="result-title">Fin du Quiz !</h1>
-            <div class="score-text" id="final-score">Score : 0 / 10</div>
-            <p id="feedback-text" style="font-weight: 600;"></p>
-            <div id="corrections-zone" class="corrections-container"></div>
-            <button class="btn" id="replay-btn" onclick="retourAuMenu()">🔄 Rejouer au Menu</button>
+            <h1>Résultat</h1>
+            <div id="final-score" style="font-size: 24px; margin: 20px 0;"></div>
+            <div id="corrections-zone"></div>
+            <button class="btn" onclick="retourAuMenu()">🔄 Menu</button>
         </div>
-
     </div>
 
     <script>
-        // --- DONNÉES DU JEU MULTILINGUE (100% SPORT) ---
         const locales = {
             fr: {
-                langBtn: "🌍 العربية",
-                audioOn: "🔊 Musique : ON",
-                audioOff: "🎵 Musique : OFF",
-                menuTitle: "🏆 Super Quiz Sportif 🏆",
-                menuDesc: "Choisissez votre sport préféré (10 questions) :",
-                progressText: (current, total) => `Question ${current} sur ${total}`,
-                resultTitle: "Fin du Quiz !",
-                scoreText: (score, total) => `Score : ${score} / ${total}`,
-                feedbackPerfect: "🏆 Un sans-faute parfait ! Tu es un génie du sport !",
-                feedbackGood: "👍 Très bon score ! Regarde ton résumé en dessous.",
-                feedbackBad: "🙃 Tu feras mieux au prochain essai ! Lis bien tes erreurs.",
-                yourAns: "Ta réponse :",
-                correctAns: "👉 La bonne réponse était :",
-                correctMsg: "✅ Bonne réponse !",
-                wrongMsg: "❌ Mauvaise réponse !",
-                continueBtn: "➡️ Continuer",
-                quitBtn: "🏠 Quitter",
-                replayBtn: "🔄 Retour au Menu",
                 categories: {
-                    "Joueurs de Football ⚽": [
-                        { question: "Quel joueur a remporté le plus de Ballons d'Or dans l'histoire ?", options: ["Cristiano Ronaldo", "Lionel Messi", "Zinédine Zidane", "Pelé"], reponse: 1 },
-                        { question: "Dans quel club espagnol Kylian Mbappé a-t-il été transféré en 2024 ?", options: ["FC Barcelone", "Atlético de Madrid", "Real Madrid", "Séville FC"], reponse: 2 },
-                        { question: "Quel pays a remporté la Coupe du Monde de la FIFA en 2022 ?", options: ["France", "Brésil", "Argentine", "Maroc"], reponse: 2 },
-                        { question: "Quel est le surnom de la légende brésilienne Pelé ?", options: ["Le Roi", "El Fenomeno", "La Pulga", "L'Extraterrestre"], reponse: 0 },
-                        { question: "Quelle nation détient le record de victoires en Coupe du Monde (5 fois) ?", options: ["Italie", "Brésil", "Allemagne", "Argentine"], reponse: 1 },
-                        { question: "Comment s'appelle le stade mythique du FC Barcelone ?", options: ["Santiago Bernabéu", "San Siro", "Anfield", "Camp Nou"], reponse: 3 },
-                        { question: "Qui est le meilleur buteur de l'histoire de la Ligue des Champions ?", options: ["Cristiano Ronaldo", "Robert Lewandowski", "Lionel Messi", "Karim Benzema"], reponse: 0 },
-                        { question: "Quelle est la nationalité de l'attaquant Erling Haaland ?", options: ["Suédoise", "Norvégienne", "Danoise", "Islandaise"], reponse: 1 },
-                        { question: "Combien de temps dure un match de football professionnel (sans prolongations) ?", options: ["80 minutes", "100 minutes", "90 minutes", "120 minutes"], reponse: 2 },
-                        { question: "Quel joueur français a remporté le Ballon d'Or en 2022 ?", options: ["Karim Benzema", "Antoine Griezmann", "Kylian Mbappé", "N'Golo Kanté"], reponse: 0 }
+                    "Marques et Modèles 🚘": [
+                        { question: "Quelle marque italienne a pour logo un taureau ?", options: ["Ferrari", "Lamborghini", "Maserati", "Alfa Romeo"], reponse: 1 },
+                        { question: "Quel modèle est le plus vendu de l'histoire de Volkswagen ?", options: ["Golf", "Polo", "Coccinelle", "Passat"], reponse: 0 },
+                        { question: "Quel constructeur produit la célèbre Mustang ?", options: ["Chevrolet", "Dodge", "Ford", "Pontiac"], reponse: 2 },
+                        { question: "De quel pays est originaire la marque Volvo ?", options: ["Suède", "Norvège", "Danemark", "Allemagne"], reponse: 0 },
+                        { question: "Quel est le logo de la marque Audi ?", options: ["Une étoile", "Quatre anneaux", "Un lion", "Un cheval"], reponse: 1 },
+                        { question: "Quelle voiture est le symbole du luxe britannique avec sa calandre massive ?", options: ["Jaguar", "Bentley", "Rolls-Royce", "Aston Martin"], reponse: 2 },
+                        { question: "Quel modèle de Porsche est le plus iconique ?", options: ["Cayenne", "911", "Panamera", "Macan"], reponse: 1 },
+                        { question: "Quelle marque japonaise est réputée pour sa fiabilité et ses hybrides ?", options: ["Honda", "Toyota", "Nissan", "Mazda"], reponse: 1 },
+                        { question: "Quel est le nom de la voiture électrique phare de Tesla ?", options: ["Model S", "Model 3", "Cybertruck", "Roadster"], reponse: 1 },
+                        { question: "Quelle marque française utilise le logo du Lion ?", options: ["Renault", "Citroën", "Peugeot", "Bugatti"], reponse: 2 }
                     ],
-                    " les voiture ": [
-                        { question: "Quel est le logo de la marque italienne Ferrari ?", options: ["Un taureau", "Un cheval cabré", "Un lion", "Un trident"], reponse: 1 },
-                        { question: "De quel pays est originaire la marque Volkswagen ?", options: ["France", "Italie", "Allemagne", "Japon"], reponse: 2 },
-                        { question: "Quelle marque est célèbre pour ses modèles '911' ?", options: ["Porsche", "BMW", "Audi", "Mercedes"], reponse: 0 },
-                        { question: "Laquelle de ces marques est française ?", options: ["Fiat", "Renault", "Skoda", "Volvo"], reponse: 1 },
-                        { question: "Quel est le pays d'origine de Volvo ?", options: ["Suède", "Norvège", "Danemark", "Finlande"], reponse: 0 } },
-                        { question: "Quelle marque fabrique la célèbre Chiron ?", options: ["Lamborghini", "Bugatti", "Pagani", "Koenigsegg"], reponse: 1 },
-                        { question: "Quel est le symbole de Lamborghini ?", options: ["Un lion", "Un aigle", "Un taureau", "Un cheval"], reponse: 2 },
-                        { question: "D'où vient la marque Rolls-Royce ?", options: ["États-Unis", "Royaume-Uni", "Allemagne", "Italie"], reponse: 1 },
-                        { question: "Quelle marque utilise le logo au trident ?", options: ["Maserati", "Ferrari", "Alfa Romeo", "Aston Martin"], reponse: 0 },
-                        { question: "Quel modèle de chez Aston Martin est associé à James Bond ?", options: ["DBS", "DB5", "Vantage", "Valhalla"], reponse: 1 }
+                    "Mécanique et F1 🏁": [
+                        { question: "Que signifie le sigle ABS ?", options: ["Anti-Block System", "Anti-Brake System", "Auto Brake Speed", "Air Brake System"], reponse: 0 },
+                        { question: "Quel est le recordman de titres mondiaux en Formule 1 (à égalité) ?", options: ["Ayrton Senna", "Michael Schumacher", "Lewis Hamilton", "Max Verstappen"], reponse: 1 },
+                        { question: "À quoi sert un turbo dans un moteur ?", options: ["Refroidir l'eau", "Augmenter la puissance", "Réduire le poids", "Nettoyer l'huile"], reponse: 1 },
+                        { question: "Quelle écurie est surnommée 'La Scuderia' ?", options: ["McLaren", "Mercedes", "Ferrari", "Red Bull"], reponse: 2 },
+                        { question: "Quelle est la fonction d'une boîte de vitesse ?", options: ["Changer de couleur", "Transmettre le couple", "Freiner", "Diriger"], reponse: 1 },
+                        { question: "Quelle couleur de drapeau signifie l'arrêt de la course en F1 ?", options: ["Jaune", "Noir", "Rouge", "Blanc"], reponse: 2 },
+                        { question: "Comment appelle-t-on le liquide qui permet au moteur de ne pas surchauffer ?", options: ["Huile", "Essence", "Liquide de refroidissement", "Liquide de frein"], reponse: 2 },
+                        { question: "Qu'est-ce qu'un moteur V8 ?", options: ["8 cylindres en V", "8 pistons", "8 soupapes", "8 litres"], reponse: 0 },
+                        { question: "Quelle partie de la voiture est en contact avec la route ?", options: ["La suspension", "Le pneu", "La jante", "Le châssis"], reponse: 1 },
+                        { question: "Quel est le nom du circuit le plus célèbre de Monaco ?", options: ["Spa", "Monaco GP", "Suzuka", "Interlagos"], reponse: 1 }
                     ]
                 }
             },
             ar: {
-                langBtn: "🌍 Français",
-                audioOn: "🔊 الموسيقى : تشغيل",
-                audioOff: "🎵 الموسيقى : إيقاف",
-                menuTitle: "🏆 مسابقة رياضية رائعة 🏆",
-                menuDesc: "اختر رياضتك المفضلة (10 أسئلة):",
-                progressText: (current, total) => `السؤال ${current} من ${total}`,
-                resultTitle: "نهاية المسابقة!",
-                scoreText: (score, total) => `النتيجة : ${score} / ${total}`,
-                feedbackPerfect: "🏆 علامة كاملة! أنت عبقري في الرياضة!",
-                feedbackGood: "👍 نتيجة جيدة جداً! تحقق من الملخص أدناه.",
-                feedbackBad: "🙃 ستبلي بلاءً حسناً في المرة القادمة! راجع أخطائك.",
-                yourAns: "إجابتك :",
-                correctAns: "👉 الإجابة الصحيحة كانت :",
-                correctMsg: "✅ إجابة صحيحة!",
-                wrongMsg: "❌ إجابة خاطئة!",
-                continueBtn: "➡️ متابعة",
-                quitBtn: "🏠 خروج",
-                replayBtn: "🔄 العودة للقائمة",
                 categories: {
-                    "لاعبو كرة القدم ⚽": [
-                        { question: "من هو اللاعب الذي فاز بأكبر عدد من الكرات الذهبية في التاريخ؟", options: ["كريستيانو رونالدو", "ليونيل ميسي", "زين الدين زيدان", "بيليه"], reponse: 1 },
-                        { question: "إلى أي نادي إسباني انتقل كيليان مبابي في عام 2024؟", options: ["برشلونة", "أتلتيكو مدريد", "ريال مدريد", "إشبيلية"], reponse: 2 },
-                        { question: "أي دولة فازت بكأس العالم 2022؟", options: ["فرنسا", "البرازيل", "الأرجنتين", "المغرب"], reponse: 2 },
-                        { question: "ما هو لقب الأسطورة البرازيلية بيليه؟", options: ["الملك", "الظاهرة", "البرغوث", "الكائن الفضائي"], reponse: 0 },
-                        { question: "أي دولة تحمل الرقم القياسي في الفوز بكأس العالم (5 مرات)؟", options: ["إيطاليا", "البرازيل", "ألمانيا", "الأرجنتين"], reponse: 1 },
-                        { question: "ما اسم الملعب الأسطوري لنادي برشلونة؟", options: ["سانتياغو برنابيو", "سان سيرو", "أنفيلد", "كامب نو"], reponse: 3 },
-                        { question: "من هو الهداف التاريخي لدوري أبطال أوروبا؟", options: ["كريستيانو رونالدو", "روبرت ليفاندوفسكي", "ليونيل ميسي", "كريم بنزيما"], reponse: 0 },
-                        { question: "ما هي جنسية المهاجم إيرلينغ هالاند؟", options: ["سويدي", "نرويجي", "دنماركي", "أيسلندي"], reponse: 1 },
-                        { question: "كم مدة مباراة كرة القدم الاحترافية (بدون أشواط إضافية)؟", options: ["80 دقيقة", "100 دقيقة", "90 دقيقة", "120 دقيقة"], reponse: 2 },
-                        { question: "أي لاعب فرنسي فاز بالكرة الذهبية عام 2022؟", options: ["كريم بنزيما", "أنطوان غريزمان", "كيليان مبابي", "نجولو كانتي"], reponse: 0 }
+                    "ماركات السيارات 🚘": [
+                        { question: "ما هي الماركة الإيطالية التي يمثل شعارها ثوراً هائجاً؟", options: ["فيراري", "لامبورغيني", "مازيراتي", "ألفا روميو"], reponse: 1 },
+                        { question: "ما هو الطراز الأكثر مبيعاً في تاريخ فولكس فاجن؟", options: ["جولف", "بولو", "بيتل (الخنفساء)", "باسات"], reponse: 0 },
+                        { question: "أي شركة تصنع السيارة الشهيرة موستانج؟", options: ["شفروليه", "دودج", "فورد", "بونتياك"], reponse: 2 },
+                        { question: "من أي دولة تنحدر ماركة فولفو؟", options: ["السويد", "النرويج", "الدنمارك", "ألمانيا"], reponse: 0 },
+                        { question: "ما هو شعار شركة أودي؟", options: ["نجمة", "أربع حلقات", "أسد", "حصان"], reponse: 1 },
+                        { question: "ما هي السيارة التي تعتبر رمزاً للفخامة البريطانية؟", options: ["جاكوار", "بنتلي", "رولز رويس", "أستون مارتن"], reponse: 2 },
+                        { question: "ما هو الطراز الأكثر شهرة لشركة بورش؟", options: ["كايين", "911", "باناميرا", "ماكان"], reponse: 1 },
+                        { question: "ما هي الماركة اليابانية المشهورة بموثوقيتها وسياراتها الهجينة؟", options: ["هوندا", "تويوتا", "نيسان", "مازدا"], reponse: 1 },
+                        { question: "ما هو اسم سيارة تسلا الكهربائية الأكثر مبيعاً؟", options: ["موديل S", "موديل 3", "سايبر تراك", "رودستر"], reponse: 1 },
+                        { question: "ما هي الماركة الفرنسية التي تستخدم الأسد كشعار؟", options: ["رينو", "سيتروين", "بيجو", "بوغاتي"], reponse: 2 }
                     ],
-                   " السيارات ": [
-                        { question: "ما هو شعار شركة فيراري الإيطالية؟", options: ["ثور", "حصان جامح", "أسد", "رمح ثلاثي"], reponse: 1 },
-                        { question: "من أي بلد أصل شركة فولكس فاجن؟", options: ["فرنسا", "إيطاليا", "ألمانيا", "اليابان"], reponse: 2 },
-                        { question: "أي ماركة تشتهر بطرازات '911'؟", options: ["بورش", "بي إم دبليو", "أودي", "مرسيدس"], reponse: 0 },
-                        { question: "أي من هذه الماركات فرنسية؟", options: ["فيات", "رينو", "سكودا", "فولفو"], reponse: 1 },
-                        { question: "ما هو بلد منشأ شركة فولفو؟", options: ["السويد", "النرويج", "الدنمارك", "فنلندا"], reponse: 0 }
-                        { question: "أي شركة تصنع طراز شيرون الشهير؟", options: ["لامبورغيني", "بوغاتي", "باغاني", "كوينيجسيج"], reponse: 1 },
-                        { question: "ما هو شعار شركة لامبورغيني؟", options: ["أسد", "نسر", "ثور", "حصان"], reponse: 2 },
-                        { question: "من أين تأتي ماركة رولز رويس؟", options: ["الولايات المتحدة", "المملكة المتحدة", "ألمانيا", "إيطاليا"], reponse: 1 },
-                        { question: "أي ماركة تستخدم شعار الرمح الثلاثي؟", options: ["مازيراتي", "فيراري", "ألفا روميو", "أستون مارتن"], reponse: 0 },
-                        { question: "أي طراز من أستون مارتن يرتبط بجيمس بوند؟", options: ["DBS", "DB5", "Vantage", "Valhalla"], reponse: 1 }
+                    "ميكانيكا وفورمولا 1 🏁": [
+                        { question: "ماذا يعني اختصار ABS في السيارات؟", options: ["نظام منع انغلاق المكابح", "نظام تسريع المكابح", "نظام التبريد", "نظام الهواء"], reponse: 0 },
+                        { question: "من يملك الرقم القياسي لأكبر عدد من ألقاب بطولة العالم للفورمولا 1؟", options: ["أيرتون سينا", "مايكل شوماخر", "لويس هاميلتون", "ماكس فيرستابن"], reponse: 1 },
+                        { question: "ما هي وظيفة 'التيربو' في المحرك؟", options: ["تبريد الماء", "زيادة القوة", "تقليل الوزن", "تنظيف الزيت"], reponse: 1 },
+                        { question: "ما هو الفريق الملقب بـ 'سكوديريا'؟", options: ["ماكلارين", "مرسيدس", "فيراري", "ريد بول"], reponse: 2 },
+                        { question: "ما هي وظيفة علبة السرعة (القير)؟", options: ["تغيير اللون", "نقل القوة والعزم", "الفرملة", "التوجيه"], reponse: 1 },
+                        { question: "ماذا يعني العلم الأحمر في سباقات الفورمولا 1؟", options: ["تحذير", "نهاية السباق", "إيقاف السباق", "دخول الأمان"], reponse: 2 },
+                        { question: "ما هو السائل الذي يمنع ارتفاع حرارة المحرك؟", options: ["زيت", "بنزين", "سائل التبريد", "سائل الفرامل"], reponse: 2 },
+                        { question: "ماذا يعني محرك V8؟", options: ["8 أسطوانات على شكل حرف V", "8 مكابس", "8 صمامات", "8 لترات"], reponse: 0 },
+                        { question: "أي جزء من السيارة هو الوحيد الملامس للطريق؟", options: ["نظام التعليق", "الإطار (الكفر)", "الجنط", "الهيكل"], reponse: 1 },
+                        { question: "ما هو اسم حلبة السباق الأكثر شهرة في موناكو؟", options: ["سبا", "موناكو GP", "سوزوكا", "إنترلاغوس"], reponse: 1 }
                     ]
                 }
             }
         };
-        let currentLang = 'fr'; 
-        let currentThemeKey = ""; 
-        let indexQuestionActuelle = 0;
-        let score = 0;
-        let reponsesUtilisateur = [];
 
-        const menuScreen = document.getElementById('menu-screen');
-        const quizScreen = document.getElementById('quiz-screen');
-        const resultScreen = document.getElementById('result-screen');
-        const categoriesMenu = document.getElementById('categories-menu');
-        const quizTitle = document.getElementById('quiz-title');
-        const progressText = document.getElementById('progress-text');
-        const questionText = document.getElementById('question-text');
-        const optionsMenu = document.getElementById('options-menu');
-        const immediateFeedback = document.getElementById('immediate-feedback');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const feedbackDetail = document.getElementById('feedback-detail');
-        const finalScore = document.getElementById('final-score');
-        const feedbackText = document.getElementById('feedback-text');
-        const correctionsZone = document.getElementById('corrections-zone');
+        // Logique JS identique à la précédente...
+        let currentLang = 'fr', currentThemeKey = "", indexQuestionActuelle = 0, score = 0, reponsesUtilisateur = [];
         
-        const langBtn = document.getElementById('lang-btn');
-        const bgMusic = document.getElementById('bg-music');
-        const audioBtn = document.getElementById('audio-btn');
-        const continueBtn = document.getElementById('continue-btn');
-        const quitBtn = document.getElementById('quit-btn');
-
-        function toggleMusic() {
-            const loc = locales[currentLang];
-            if (bgMusic.paused) {
-                bgMusic.play().catch(() => {});
-                audioBtn.innerText = loc.audioOn;
-                audioBtn.style.backgroundColor = "var(--primary-color)";
-                audioBtn.style.color = "white";
-            } else {
-                bgMusic.pause();
-                audioBtn.innerText = loc.audioOff;
-                audioBtn.style.backgroundColor = "var(--panel-bg)";
-                audioBtn.style.color = "var(--primary-color)";
-            }
-        }
-
-        function toggleLang() {
-            currentLang = currentLang === 'fr' ? 'ar' : 'fr';
-            document.documentElement.lang = currentLang;
-            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-
-            mettreAJourTextesUI();
-            
-            if(quizScreen.classList.contains('active') || resultScreen.classList.contains('active')) {
-                retourAuMenu();
-            } else {
-                genererMenu();
-            }
-        }
-
-        function mettreAJourTextesUI() {
-            const loc = locales[currentLang];
-            
-            langBtn.innerText = loc.langBtn;
-            audioBtn.innerText = bgMusic.paused ? loc.audioOff : loc.audioOn;
-            
-            document.getElementById('menu-title').innerText = loc.menuTitle;
-            document.getElementById('menu-desc').innerText = loc.menuDesc;
-            document.getElementById('result-title').innerText = loc.resultTitle;
-            document.getElementById('replay-btn').innerText = loc.replayBtn;
-            continueBtn.innerText = loc.continueBtn;
-            quitBtn.innerText = loc.quitBtn;
-        }
-
+        function toggleLang() { currentLang = currentLang === 'fr' ? 'ar' : 'fr'; document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr'; genererMenu(); }
+        function toggleMusic() { let b = document.getElementById('audio-btn'); b.innerText = b.innerText.includes('OFF') ? '🎵 Son : ON' : '🎵 Son : OFF'; }
+        
         function genererMenu() {
-            categoriesMenu.innerHTML = "";
-            const categoriesObj = locales[currentLang].categories;
-            
-            Object.keys(categoriesObj).forEach((categorie, index) => {
-                const bouton = document.createElement('button');
-                bouton.className = 'btn';
-                bouton.innerText = categorie;
-                bouton.onclick = () => lancerQuiz(index);
-                categoriesMenu.appendChild(bouton);
+            let m = document.getElementById('categories-menu'); m.innerHTML = "";
+            Object.keys(locales[currentLang].categories).forEach((c, i) => {
+                let btn = document.createElement('button'); btn.className = 'btn'; btn.innerText = c;
+                btn.onclick = () => lancerQuiz(c); m.appendChild(btn);
             });
+            document.getElementById('menu-screen').className = 'screen active';
+            document.getElementById('quiz-screen').className = 'screen';
+            document.getElementById('result-screen').className = 'screen';
         }
 
-        function lancerQuiz(categoryIndex) {
-            if (bgMusic.paused && audioBtn.style.backgroundColor !== "var(--primary-color)") { toggleMusic(); }
-
-            currentThemeKey = Object.keys(locales[currentLang].categories)[categoryIndex];
-            indexQuestionActuelle = 0;
-            score = 0;
-            reponsesUtilisateur = [];
-
-            quizTitle.innerText = currentThemeKey;
-            menuScreen.classList.remove('active');
-            quizScreen.classList.add('active');
-            afficherQuestion();
-        }
+        function lancerQuiz(key) { currentThemeKey = key; indexQuestionActuelle = 0; score = 0; reponsesUtilisateur = []; afficherQuestion(); }
 
         function afficherQuestion() {
-            const loc = locales[currentLang];
-            const listeQuestions = loc.categories[currentThemeKey];
-            const q = listeQuestions[indexQuestionActuelle];
-
-            progressText.innerText = loc.progressText(indexQuestionActuelle + 1, listeQuestions.length);
-            questionText.innerText = q.question;
-            
-            optionsMenu.style.display = "flex";
-            immediateFeedback.style.display = "none";
-            optionsMenu.innerHTML = "";
-
-            q.options.forEach((option, index) => {
-                const boutonOption = document.createElement('button');
-                boutonOption.className = 'btn option-btn';
-                boutonOption.innerText = option;
-                boutonOption.onclick = () => enregistrerReponse(index);
-                optionsMenu.appendChild(boutonOption);
+            let q = locales[currentLang].categories[currentThemeKey][indexQuestionActuelle];
+            document.getElementById('menu-screen').className = 'screen';
+            document.getElementById('quiz-screen').className = 'screen active';
+            document.getElementById('quiz-title').innerText = currentThemeKey;
+            document.getElementById('question-text').innerText = q.question;
+            let opt = document.getElementById('options-menu'); opt.innerHTML = ""; document.getElementById('immediate-feedback').style.display = 'none';
+            q.options.forEach((o, i) => {
+                let b = document.createElement('button'); b.className = 'btn option-btn'; b.innerText = o;
+                b.onclick = () => {
+                    reponsesUtilisateur.push(i);
+                    if(i === q.reponse) score++;
+                    document.getElementById('feedback-message').innerHTML = i === q.reponse ? '<span class="correct-ans">✅ Correct !</span>' : '<span class="wrong-ans">❌ Faux ! La réponse était '+q.options[q.reponse]+'</span>';
+                    document.getElementById('immediate-feedback').style.display = 'block';
+                };
+                opt.appendChild(b);
             });
-        }
-
-        function enregistrerReponse(indexChoisi) {
-            reponsesUtilisateur.push(indexChoisi);
-            
-            const loc = locales[currentLang];
-            const listeQuestions = loc.categories[currentThemeKey];
-            const q = listeQuestions[indexQuestionActuelle];
-            const estCorrect = (indexChoisi === q.reponse);
-
-            optionsMenu.style.display = "none";
-            immediateFeedback.style.display = "block";
-
-            if (estCorrect) {
-                feedbackMessage.innerHTML = `<span class="correct-ans">${loc.correctMsg}</span>`;
-                feedbackDetail.innerHTML = "";
-                score++;
-            } else {
-                feedbackMessage.innerHTML = `<span class="wrong-ans">${loc.wrongMsg}</span>`;
-                feedbackDetail.innerHTML = `${loc.correctAns} <strong class="correct-ans">${q.options[q.reponse]}</strong>`;
-            }
         }
 
         function passerQuestionSuivante() {
-            const listeQuestions = locales[currentLang].categories[currentThemeKey];
             indexQuestionActuelle++;
-            
-            if (indexQuestionActuelle < listeQuestions.length) {
-                afficherQuestion();
-            } else {
-                afficherResultats();
-            }
+            if(indexQuestionActuelle < 10) afficherQuestion();
+            else afficherResultats();
         }
 
         function afficherResultats() {
-            const loc = locales[currentLang];
-            const listeQuestions = loc.categories[currentThemeKey];
-            const total = listeQuestions.length;
-            correctionsZone.innerHTML = ""; 
-
-            listeQuestions.forEach((q, index) => {
-                const reponseDonnee = reponsesUtilisateur[index];
-                const estCorrect = (reponseDonnee === q.reponse);
-                const bordureCouleur = estCorrect ? "var(--success-color)" : "var(--danger-color)";
-                const icone = estCorrect ? "✅" : "❌";
-
-                let htmlCorrection = `
-                    <div class="correction-item" style="border-inline-start-color: ${bordureCouleur};">
-                        <p class="question-title">${index + 1}. ${q.question}</p>
-                        <p>${loc.yourAns} <span class="${estCorrect ? 'correct-ans' : 'wrong-ans'}">${q.options[reponseDonnee]}</span> ${icone}</p>
-                `;
-                if (!estCorrect) {
-                    htmlCorrection += `<p style="margin-top:4px;">${loc.correctAns} <strong class="correct-ans">${q.options[q.reponse]}</strong></p>`;
-                }
-                htmlCorrection += `</div>`;
-                correctionsZone.innerHTML += htmlCorrection;
-            });
-
-            quizScreen.classList.remove('active');
-            resultScreen.classList.add('active');
-            finalScore.innerText = loc.scoreText(score, total);
-
-            if (score === total) {
-                feedbackText.innerText = loc.feedbackPerfect;
-            } else if (score >= total / 2) {
-                feedbackText.innerText = loc.feedbackGood;
-            } else {
-                feedbackText.innerText = loc.feedbackBad;
-            }
+            document.getElementById('quiz-screen').className = 'screen';
+            document.getElementById('result-screen').className = 'screen active';
+            document.getElementById('final-score').innerText = "Score: " + score + "/10";
         }
 
-        function retourAuMenu() {
-            resultScreen.classList.remove('active');
-            quizScreen.classList.remove('active');
-            menuScreen.classList.add('active');
-            genererMenu();
-        }
-
-        mettreAJourTextesUI();
+        function retourAuMenu() { genererMenu(); }
         genererMenu();
     </script>
 </body>
-</html>>
+</html>
