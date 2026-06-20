@@ -102,6 +102,15 @@
             filter: brightness(1.05);
         }
 
+        /* Bouton rouge pour quitter */
+        .btn-danger {
+            background-color: var(--danger-color);
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
+        }
+        .btn-danger:hover {
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
+        }
+
         .option-btn {
             background-color: #f8fafc;
             color: var(--text-dark);
@@ -130,14 +139,35 @@
             color: var(--primary-color);
         }
 
+        /* Correction immédiate */
+        #immediate-feedback {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-buttons .btn {
+            margin: 0;
+            width: 100%;
+        }
+
+        /* Correction de fin */
         .corrections-container {
             max-height: 350px;
             overflow-y: auto;
             margin: 25px 0;
             padding: 0 10px;
-            text-align: start; /* S'adapte au RTL/LTR */
+            text-align: start;
         }
-
         .corrections-container::-webkit-scrollbar { width: 6px; }
         .corrections-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
         .corrections-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -148,9 +178,8 @@
             margin-bottom: 12px;
             border-radius: 10px;
             border: 1px solid #e2e8f0;
-            border-inline-start: 5px solid; /* S'adapte au RTL/LTR */
+            border-inline-start: 5px solid;
         }
-
         .correction-item p { margin: 6px 0; }
         .question-title { font-weight: bold; color: var(--accent-color); }
         .correct-ans { color: var(--success-color); font-weight: 600; }
@@ -182,7 +211,20 @@
             <h2 id="quiz-title" style="color: var(--primary-color);">Domaine</h2>
             <div class="progress" id="progress-text">Question 1 sur 10</div>
             <h3 id="question-text">La question s'affichera ici</h3>
+            
+            <!-- Les choix de réponses -->
             <div id="options-menu" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;"></div>
+            
+            <!-- La correction immédiate (Cachée par défaut) -->
+            <div id="immediate-feedback" style="display: none;">
+                <p id="feedback-message" style="font-size: 22px; font-weight: bold; margin-top: 0;"></p>
+                <p id="feedback-detail" style="font-size: 16px; margin-bottom: 20px;"></p>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-danger" id="quit-btn" onclick="retourAuMenu()">🏠 Quitter</button>
+                    <button class="btn" id="continue-btn" onclick="passerQuestionSuivante()">➡️ Continuer</button>
+                </div>
+            </div>
         </div>
 
         <!-- RÉSULTAT ET CORRECTION FINALE -->
@@ -191,7 +233,7 @@
             <div class="score-text" id="final-score">Score : 0 / 10</div>
             <p id="feedback-text" style="font-weight: 600;"></p>
             <div id="corrections-zone" class="corrections-container"></div>
-            <button class="btn" id="replay-btn" onclick="retourAuMenu()">🔄 Rejouer</button>
+            <button class="btn" id="replay-btn" onclick="retourAuMenu()">🔄 Rejouer au Menu</button>
         </div>
 
     </div>
@@ -209,11 +251,15 @@
                 resultTitle: "Fin du Quiz !",
                 scoreText: (score, total) => `Score : ${score} / ${total}`,
                 feedbackPerfect: "🏆 Un sans-faute parfait ! Tu es un génie !",
-                feedbackGood: "👍 Très bon score ! Regarde la correction en dessous.",
-                feedbackBad: "🙃 Tu feras mieux au prochain essai ! Lis la correction.",
+                feedbackGood: "👍 Très bon score ! Regarde ton résumé en dessous.",
+                feedbackBad: "🙃 Tu feras mieux au prochain essai ! Lis bien tes erreurs.",
                 yourAns: "Ta réponse :",
-                correctAns: "👉 Bonne réponse :",
-                replayBtn: "🔄 Rejouer au Menu",
+                correctAns: "👉 La bonne réponse était :",
+                correctMsg: "✅ Bonne réponse !",
+                wrongMsg: "❌ Mauvaise réponse !",
+                continueBtn: "➡️ Continuer",
+                quitBtn: "🏠 Quitter",
+                replayBtn: "🔄 Retour au Menu",
                 categories: {
                     "Joueurs de Football ⚽": [
                         { question: "Quel joueur a remporté le plus de Ballons d'Or dans l'histoire ?", options: ["Cristiano Ronaldo", "Lionel Messi", "Zinédine Zidane", "Pelé"], reponse: 1 },
@@ -263,10 +309,14 @@
                 resultTitle: "نهاية المسابقة!",
                 scoreText: (score, total) => `النتيجة : ${score} / ${total}`,
                 feedbackPerfect: "🏆 علامة كاملة! أنت عبقري!",
-                feedbackGood: "👍 نتيجة جيدة جداً! تحقق من التصحيح أدناه.",
-                feedbackBad: "🙃 ستبلي بلاءً حسناً في المرة القادمة! اقرأ التصحيح.",
+                feedbackGood: "👍 نتيجة جيدة جداً! تحقق من الملخص أدناه.",
+                feedbackBad: "🙃 ستبلي بلاءً حسناً في المرة القادمة! راجع أخطائك.",
                 yourAns: "إجابتك :",
-                correctAns: "👉 الإجابة الصحيحة :",
+                correctAns: "👉 الإجابة الصحيحة كانت :",
+                correctMsg: "✅ إجابة صحيحة!",
+                wrongMsg: "❌ إجابة خاطئة!",
+                continueBtn: "➡️ متابعة",
+                quitBtn: "🏠 خروج",
                 replayBtn: "🔄 العودة للقائمة",
                 categories: {
                     "لاعبو كرة القدم ⚽": [
@@ -309,14 +359,12 @@
             }
         };
 
-        // --- VARIABLES DE JEU ---
-        let currentLang = 'fr'; // Langue par défaut
-        let currentThemeKey = ""; // Garde la trace du thème sélectionné via son index
+        let currentLang = 'fr'; 
+        let currentThemeKey = ""; 
         let indexQuestionActuelle = 0;
         let score = 0;
         let reponsesUtilisateur = [];
 
-        // Éléments
         const menuScreen = document.getElementById('menu-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultScreen = document.getElementById('result-screen');
@@ -325,6 +373,9 @@
         const progressText = document.getElementById('progress-text');
         const questionText = document.getElementById('question-text');
         const optionsMenu = document.getElementById('options-menu');
+        const immediateFeedback = document.getElementById('immediate-feedback');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const feedbackDetail = document.getElementById('feedback-detail');
         const finalScore = document.getElementById('final-score');
         const feedbackText = document.getElementById('feedback-text');
         const correctionsZone = document.getElementById('corrections-zone');
@@ -332,8 +383,9 @@
         const langBtn = document.getElementById('lang-btn');
         const bgMusic = document.getElementById('bg-music');
         const audioBtn = document.getElementById('audio-btn');
+        const continueBtn = document.getElementById('continue-btn');
+        const quitBtn = document.getElementById('quit-btn');
 
-        // --- GESTION AUDIO ET LANGUE ---
         function toggleMusic() {
             const loc = locales[currentLang];
             if (bgMusic.paused) {
@@ -351,14 +403,11 @@
 
         function toggleLang() {
             currentLang = currentLang === 'fr' ? 'ar' : 'fr';
-            
-            // Changer la direction du document HTML (RTL/LTR)
             document.documentElement.lang = currentLang;
             document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
 
             mettreAJourTextesUI();
             
-            // Si l'utilisateur change la langue pendant le quiz, on le ramène au menu pour éviter les bugs
             if(quizScreen.classList.contains('active') || resultScreen.classList.contains('active')) {
                 retourAuMenu();
             } else {
@@ -376,14 +425,14 @@
             document.getElementById('menu-desc').innerText = loc.menuDesc;
             document.getElementById('result-title').innerText = loc.resultTitle;
             document.getElementById('replay-btn').innerText = loc.replayBtn;
+            continueBtn.innerText = loc.continueBtn;
+            quitBtn.innerText = loc.quitBtn;
         }
 
-        // --- GESTION DU QUIZ ---
         function genererMenu() {
             categoriesMenu.innerHTML = "";
             const categoriesObj = locales[currentLang].categories;
             
-            // On utilise Object.keys pour avoir l'index, utile si on veut retrouver la catégorie lors d'un switch (optionnel)
             Object.keys(categoriesObj).forEach((categorie, index) => {
                 const bouton = document.createElement('button');
                 bouton.className = 'btn';
@@ -414,6 +463,10 @@
 
             progressText.innerText = loc.progressText(indexQuestionActuelle + 1, listeQuestions.length);
             questionText.innerText = q.question;
+            
+            // Afficher les options, cacher la correction
+            optionsMenu.style.display = "flex";
+            immediateFeedback.style.display = "none";
             optionsMenu.innerHTML = "";
 
             q.options.forEach((option, index) => {
@@ -427,9 +480,30 @@
 
         function enregistrerReponse(indexChoisi) {
             reponsesUtilisateur.push(indexChoisi);
+            
+            const loc = locales[currentLang];
+            const listeQuestions = loc.categories[currentThemeKey];
+            const q = listeQuestions[indexQuestionActuelle];
+            const estCorrect = (indexChoisi === q.reponse);
+
+            // Cacher les options, afficher la correction
+            optionsMenu.style.display = "none";
+            immediateFeedback.style.display = "block";
+
+            if (estCorrect) {
+                feedbackMessage.innerHTML = `<span class="correct-ans">${loc.correctMsg}</span>`;
+                feedbackDetail.innerHTML = "";
+                score++;
+            } else {
+                feedbackMessage.innerHTML = `<span class="wrong-ans">${loc.wrongMsg}</span>`;
+                feedbackDetail.innerHTML = `${loc.correctAns} <strong class="correct-ans">${q.options[q.reponse]}</strong>`;
+            }
+        }
+
+        function passerQuestionSuivante() {
+            const listeQuestions = locales[currentLang].categories[currentThemeKey];
             indexQuestionActuelle++;
             
-            const listeQuestions = locales[currentLang].categories[currentThemeKey];
             if (indexQuestionActuelle < listeQuestions.length) {
                 afficherQuestion();
             } else {
@@ -441,15 +515,11 @@
             const loc = locales[currentLang];
             const listeQuestions = loc.categories[currentThemeKey];
             const total = listeQuestions.length;
-            score = 0;
             correctionsZone.innerHTML = ""; 
 
             listeQuestions.forEach((q, index) => {
                 const reponseDonnee = reponsesUtilisateur[index];
                 const estCorrect = (reponseDonnee === q.reponse);
-                
-                if (estCorrect) score++;
-
                 const bordureCouleur = estCorrect ? "var(--success-color)" : "var(--danger-color)";
                 const icone = estCorrect ? "✅" : "❌";
 
@@ -458,11 +528,9 @@
                         <p class="question-title">${index + 1}. ${q.question}</p>
                         <p>${loc.yourAns} <span class="${estCorrect ? 'correct-ans' : 'wrong-ans'}">${q.options[reponseDonnee]}</span> ${icone}</p>
                 `;
-
                 if (!estCorrect) {
                     htmlCorrection += `<p style="margin-top:4px;">${loc.correctAns} <strong class="correct-ans">${q.options[q.reponse]}</strong></p>`;
                 }
-
                 htmlCorrection += `</div>`;
                 correctionsZone.innerHTML += htmlCorrection;
             });
@@ -487,7 +555,7 @@
             genererMenu();
         }
 
-        // Initialisation au lancement
+        // Initialisation
         mettreAJourTextesUI();
         genererMenu();
     </script>
